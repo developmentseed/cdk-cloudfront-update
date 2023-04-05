@@ -19,7 +19,7 @@ def lambda_handler(event, context):
             Id=event["ResourceProperties"]["Id"]
         )
         config_req = dict(config_res["DistributionConfig"])
-        ETag = config_res["ETag"]
+        e_tag = config_res["ETag"]
         origin_config = json.loads(event["ResourceProperties"]["OriginConfig"])
         behavior_config = json.loads(event["ResourceProperties"]["BehaviorConfig"])
 
@@ -51,16 +51,13 @@ def lambda_handler(event, context):
 
         config_req["CacheBehaviors"] = cache_behaviors
 
-        # print(json.dumps(config_req, indent=2))
-
         response = client.update_distribution(
             Id=event["ResourceProperties"]["Id"],
-            IfMatch=ETag,
+            IfMatch=e_tag,
             DistributionConfig=config_req,
         )
 
         print("Response", response)
-        print("SUCCESS")
         return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
     except Exception as e:
         logger.exception(str(e))
