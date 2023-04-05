@@ -33,7 +33,7 @@ class CloudfrontUpdate(Construct):
         distribution_id = distribution_arn.split(":distribution/")[-1]
 
         dependencies_layer = self.create_dependencies_layer(
-            "cdk.out/layers/cf_behavior_deps_layer"
+            "cdk.out/layers/cf_update_deps_layer"
         )
 
         # Cf_Update lambda function

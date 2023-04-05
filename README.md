@@ -191,3 +191,7 @@ static_site_cf = CloudfrontUpdate(
 
 static_site_cf.resource.node.add_dependency(api_cf.resource)
 ```
+
+## Dependencies/Miscellany
+
+In order to support the latest version of the Cloudfront API, this Construct will build a Lambda Layer including the latest version of `boto3`. This requires Docker to be running and will store the layer files in `./cdk.out/layers/cf_update_deps_layer`.
