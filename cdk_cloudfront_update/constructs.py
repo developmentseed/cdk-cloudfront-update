@@ -45,7 +45,6 @@ class CloudfrontUpdate(Construct):
                 os.path.join(os.path.dirname(__file__), "./update_cf/"),
             ),
             handler="update_distribution.lambda_handler",
-            tracing=lambda_.Tracing.ACTIVE,
             runtime=lambda_.Runtime.PYTHON_3_9,
             layers=[dependencies_layer],
         )
