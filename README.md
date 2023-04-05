@@ -1,6 +1,6 @@
 # CDK Cloudfront Update Construct
 
-This CDK Construct allows users to add/update origins and behaviors to an existing Cloudfront Distribution.
+This CDK Construct allows users to add and update origins and behaviors on an existing Cloudfront Distribution.
 This is specifically useful if you manage a Distribution through a separate CDK Stack and must import it into the Stack for one of your applications.
 
 ## Warnings
