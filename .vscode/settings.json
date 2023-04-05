@@ -1,0 +1,8 @@
+{
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
+  "python.linting.flake8Enabled": true,
+  "python.linting.lintOnSave": true,
+  "editor.formatOnSave": true
+}
