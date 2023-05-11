@@ -10,6 +10,7 @@ from aws_cdk import (
     aws_lambda as lambda_,
     custom_resources as cr,
     CustomResource,
+    Duration,
 )
 
 
@@ -47,6 +48,7 @@ class CloudfrontUpdate(Construct):
             handler="update_distribution.lambda_handler",
             runtime=lambda_.Runtime.PYTHON_3_9,
             layers=[dependencies_layer],
+            timeout=Duration.seconds(60),
         )
 
         cf_update_lambda.add_to_role_policy(
