@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Sequence
+from typing import Dict, Optional, Sequence
 from constructs import Construct
 from hashlib import sha256
 import json
@@ -24,8 +24,8 @@ class CloudfrontUpdate(Construct):
         scope: Construct,
         id: str,
         distribution_arn: str,
-        behavior_config: Dict,
-        origin_config: Dict,
+        behavior_config: Optional[Dict] = None,
+        origin_config: Optional[Dict] = None,
         lambda_execution_policy_statements: Sequence[iam.PolicyStatement] = [],
         **kwargs,
     ) -> None:
@@ -76,14 +76,18 @@ class CloudfrontUpdate(Construct):
         # We do the same with a hash of the provided Policy Statements
         # for the lambda execution role.
 
+        origin_behavior_config = {}
+        if behavior_config:
+            origin_behavior_config["BehaviorConfig"] = json.dumps(behavior_config)
+        if origin_config:
+            origin_behavior_config["OriginConfig"] = json.dumps(origin_config)
+
         self.resource = CustomResource(
             scope=self,
             id=generate_name(id, "CFUpdateResource"),
             service_token=self.provider.service_token,
             properties={
                 "Id": distribution_id,
-                "BehaviorConfig": json.dumps(behavior_config),
-                "OriginConfig": json.dumps(origin_config),
                 "FunctionVersion": cf_update_lambda.current_version.version,
                 "PolicyStatementHash": sha256(
                     b"\n".join(
@@ -93,6 +97,7 @@ class CloudfrontUpdate(Construct):
                         ]
                     )
                 ).hexdigest(),
+                **origin_behavior_config,
             },
         )
 
