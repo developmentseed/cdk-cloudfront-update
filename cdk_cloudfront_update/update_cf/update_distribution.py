@@ -20,14 +20,15 @@ def lambda_handler(event, context):
         )
         config_req = dict(config_res["DistributionConfig"])
         e_tag = config_res["ETag"]
-        origin_config = json.loads(event["ResourceProperties"]["OriginConfig"])
-        behavior_config = json.loads(event["ResourceProperties"]["BehaviorConfig"])
+        origin_config = json.loads(event["ResourceProperties"].get("OriginConfig"))
+        behavior_config = json.loads(event["ResourceProperties"].get("BehaviorConfig"))
 
         origins_by_id = {
             origin["Id"]: origin for origin in config_req["Origins"].get("Items", [])
         }
 
-        origins_by_id[origin_config["Id"]] = origin_config
+        if origin_config:
+            origins_by_id[origin_config["Id"]] = origin_config
 
         origins = {
             "Items": list(origins_by_id.values()),
@@ -42,7 +43,8 @@ def lambda_handler(event, context):
             for behavior in config_req["CacheBehaviors"].get("Items", [])
         }
 
-        behaviors_by_path[behavior_config["PathPattern"]] = behavior_config
+        if behavior_config:
+            behaviors_by_path[behavior_config["PathPattern"]] = behavior_config
 
         cache_behaviors = {
             "Items": list(behaviors_by_path.values()),
