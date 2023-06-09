@@ -20,8 +20,12 @@ def lambda_handler(event, context):
         )
         config_req = dict(config_res["DistributionConfig"])
         e_tag = config_res["ETag"]
-        origin_config = json.loads(event["ResourceProperties"].get("OriginConfig"))
-        behavior_config = json.loads(event["ResourceProperties"].get("BehaviorConfig"))
+        origin_config = json.loads(
+            event["ResourceProperties"].get("OriginConfig", "{}")
+        )
+        behavior_config = json.loads(
+            event["ResourceProperties"].get("BehaviorConfig", "{}")
+        )
 
         origins_by_id = {
             origin["Id"]: origin for origin in config_req["Origins"].get("Items", [])
