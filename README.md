@@ -195,3 +195,67 @@ static_site_cf.resource.node.add_dependency(api_cf.resource)
 ## Dependencies/Miscellany
 
 In order to support the latest version of the Cloudfront API, this Construct will build a Lambda Layer including the latest version of `boto3`. This requires Docker to be running and will store the layer files in `./cdk.out/layers/cf_update_deps_layer`.
+
+## Forcing updates with a nonce
+
+In the event that it is desirable for the custom resource to run at every deployment, a `nonce` argument can be provided to the construct.  This will trigger the redeployment of the `CustomResource` but not the Lambda or related IAM policies.
+
+```python
+from time import time
+
+from constructs import Construct
+from cdk_cloudfront_update.constructs import CloudfrontUpdate
+
+
+class MyApi(Construct):
+    def __init__(
+        self,
+        scope: Construct,
+        id: str,
+        distribution_arn: str,
+        service_path_pattern: str,
+        load_balancer_dns_name: str,
+        **kwargs,
+    ):
+        """
+        Add MyAPI service to the Cloudfront Distribution at the
+        specified path.
+        """
+        super().__init__(scope, id, **kwargs)
+
+        origin_id = "ApiLoadBalancer"
+
+        CloudfrontUpdate(
+            self,
+            "my-api-cf-update",
+            distribution_arn=distribution_arn,
+            behavior_config={
+                "PathPattern": service_path_pattern,
+                "TargetOriginId": origin_id,
+                "TrustedSigners": {"Enabled": False, "Quantity": 0},
+                "TrustedKeyGroups": {"Enabled": False, "Quantity": 0},
+                "ViewerProtocolPolicy": "redirect-to-https",
+                "AllowedMethods": {
+                    "Quantity": 7,
+                    "Items": [
+                        "HEAD",
+                        "DELETE",
+                        "POST",
+                        "GET",
+                        "OPTIONS",
+                        "PUT",
+                        "PATCH",
+                    ],
+                    "CachedMethods": {"Quantity": 2, "Items": ["HEAD", "GET"]},
+                },
+                "SmoothStreaming": False,
+                "Compress": True,
+                "LambdaFunctionAssociations": {"Quantity": 0},
+                "FunctionAssociations": {"Quantity": 0},
+                "FieldLevelEncryptionId": "",
+                "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",  # Managed CachingDisabled Policy
+                "OriginRequestPolicyId": "216adef6-5c7f-47e4-b989-5492eafa07d3",  # Managed AllViewer Origin Request Policy
+            },
+            nonce=str(time())
+        )
+```
