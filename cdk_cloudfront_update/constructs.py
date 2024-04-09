@@ -26,6 +26,7 @@ class CloudfrontUpdate(Construct):
         distribution_arn: str,
         behavior_config: Optional[Dict] = None,
         origin_config: Optional[Dict] = None,
+        nonce: str = '',
         lambda_execution_policy_statements: Sequence[iam.PolicyStatement] = [],
         **kwargs,
     ) -> None:
@@ -89,6 +90,7 @@ class CloudfrontUpdate(Construct):
             properties={
                 "Id": distribution_id,
                 "FunctionVersion": cf_update_lambda.current_version.version,
+                "Nonce": nonce,
                 "PolicyStatementHash": sha256(
                     b"\n".join(
                         [
