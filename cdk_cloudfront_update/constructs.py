@@ -91,14 +91,6 @@ class CloudfrontUpdate(Construct):
                 "Id": distribution_id,
                 "FunctionVersion": cf_update_lambda.current_version.version,
                 "Nonce": nonce,
-                "PolicyStatementHash": sha256(
-                    b"\n".join(
-                        [
-                            json.dumps(statement.to_statement_json()).encode("utf-8")
-                            for statement in lambda_execution_policy_statements
-                        ]
-                    )
-                ).hexdigest(),
                 **origin_behavior_config,
             },
         )
